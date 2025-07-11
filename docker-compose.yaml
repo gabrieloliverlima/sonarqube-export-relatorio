@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # SAST - SonarQube
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+      - "9092:9092"
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://db:5432/sonarqube
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    depends_on:
+      - db
+    networks:
+      - sonarnet
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    container_name: sonarqube_db
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonarqube
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    networks:
+      - sonarnet
+    restart: unless-stopped
+
+  # Serviço para exportação de relatórios (sob demanda)
+  sonar-exporter:
+    image: python:3.11-slim
+    container_name: sonar_exporter
+    working_dir: /app
+    volumes:
+      - ./exports:/app/exports          # Pasta local para salvar relatórios
+      - ./scripts:/app/scripts          # Scripts de exportação
+    networks:
+      - sonarnet
+    depends_on:
+      - sonarqube
+    environment:
+      - SONAR_URL=http://sonarqube:9000
+      - SONAR_USERNAME=admin
+      - SONAR_PASSWORD=admin
+      - PROJECT_KEY=teste       #Trocar para o PROJECT_KEY configurado na Sonar
+    command: |
+      bash -c "
+        echo '📦 Instalando dependências...' &&
+        pip install --no-cache-dir requests pandas openpyxl python-dateutil pytz &&
+        apt-get update && apt-get install -y jq curl &&
+        echo '✅ Dependências instaladas!' &&
+        echo '' &&
+        echo '🚀 Exportador SonarQube pronto!' &&
+        echo '📊 Para exportar relatórios execute:' &&
+        echo '   docker-compose exec sonar-exporter python scripts/export_metrics.py' &&
+        echo '   docker-compose exec sonar-exporter python scripts/export_issues.py' &&
+        echo '   docker-compose exec sonar-exporter python scripts/export_quality_gate.py' &&
+        echo '   docker-compose exec sonar-exporter bash scripts/export_all.sh' &&
+        echo '' &&
+        echo '📁 Relatórios serão salvos em: ./exports/' &&
+        echo '⏳ Aguardando comandos...' &&
+        sleep infinity
+      "
+    restart: unless-stopped
+
+networks:
+  sonarnet:
+    driver: bridge
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql_data:
