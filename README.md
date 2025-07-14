@@ -38,7 +38,7 @@ Este projeto oferece:
 
 ```
 /
-├── docker-compose.yml              # Configuração dos containers
+├── docker compose.yml              # Configuração dos containers
 ├── sonar-project.properties        # Configurações do projeto
 ├── scripts/                        # Scripts de exportação
 │   ├── export_metrics.py           # Exporta métricas do código
@@ -84,7 +84,7 @@ Este projeto oferece:
 
 #### Opção A: Usar Token (Recomendado)
 
-1. **Editar `docker-compose.yml`**:
+1. **Editar `docker compose.yml`**:
    ```yaml
    environment:
      - SONAR_URL=http://sonarqube:9000
@@ -94,7 +94,7 @@ Este projeto oferece:
 
 #### Opção B: Usar Usuário/Senha
 
-1. **Editar `docker-compose.yml`**:
+1. **Editar `docker compose.yml`**:
    ```yaml
    environment:
      - SONAR_URL=http://sonarqube:9000
@@ -107,13 +107,13 @@ Este projeto oferece:
 
 ```bash
 # Subir todos os containers
-docker-compose up -d
+docker compose up -d
 
 # Verificar status
-docker-compose ps
+docker compose ps
 
 # Acompanhar logs do SonarQube
-docker-compose logs -f sonarqube
+docker compose logs -f sonarqube
 ```
 
 ### 4. Configurar SonarQube
@@ -145,16 +145,16 @@ sonarsource/sonar-scanner-cli
 
 ```bash
 # Executar todos os exports (RECOMENDADO)
-docker-compose exec sonar-exporter bash scripts/export_all.sh
+docker compose exec sonar-exporter bash scripts/export_all.sh
 
 # Exportar apenas métricas
-docker-compose exec sonar-exporter python scripts/export_metrics.py
+docker compose exec sonar-exporter python scripts/export_metrics.py
 
 # Exportar apenas issues
-docker-compose exec sonar-exporter python scripts/export_issues.py
+docker compose exec sonar-exporter python scripts/export_issues.py
 
 # Exportar apenas Quality Gate
-docker-compose exec sonar-exporter python scripts/export_quality_gate.py
+docker compose exec sonar-exporter python scripts/export_quality_gate.py
 
 
 ```
@@ -163,13 +163,13 @@ docker-compose exec sonar-exporter python scripts/export_quality_gate.py
 
 ```bash
 # Ver logs do exportador
-docker-compose logs sonar-exporter
+docker compose logs sonar-exporter
 
 # Ver logs do SonarQube
-docker-compose logs sonarqube
+docker compose logs sonarqube
 
 # Entrar no container
-docker-compose exec sonar-exporter bash
+docker compose exec sonar-exporter bash
 
 
 ```
@@ -243,10 +243,10 @@ exports/
 #### 1. Erro 401 (Unauthorized)
 ```bash
 # Verificar credenciais
-docker-compose exec sonar-exporter python scripts/test_credentials.py
+docker compose exec sonar-exporter python scripts/test_credentials.py
 
 # Soluções:
-# - Verificar token no docker-compose.yml
+# - Verificar token no docker compose.yml
 # - Gerar novo token no SonarQube
 # - Verificar usuário/senha
 ```
@@ -254,18 +254,18 @@ docker-compose exec sonar-exporter python scripts/test_credentials.py
 #### 2. Erro 404 (Project Not Found)
 ```bash
 # Verificar se projeto existe
-docker-compose exec sonar-exporter python scripts/check_project.py
+docker compose exec sonar-exporter python scripts/check_project.py
 
 # Soluções:
 # - Executar sonar-scanner para analisar código
 # - Criar projeto manualmente no SonarQube
-# - Verificar PROJECT_KEY no docker-compose.yml
+# - Verificar PROJECT_KEY no docker compose.yml
 ```
 
 #### 3. SonarQube Não Inicia
 ```bash
 # Verificar logs
-docker-compose logs sonarqube
+docker compose logs sonarqube
 
 # Soluções comuns:
 # - Aumentar memória Docker
@@ -279,27 +279,27 @@ docker-compose logs sonarqube
 chmod +x scripts/*.sh
 
 # Ou executar diretamente
-docker-compose exec sonar-exporter bash scripts/export_all.sh
+docker compose exec sonar-exporter bash scripts/export_all.sh
 ```
 
 ### Comandos de Debug
 
 ```bash
 # Verificar containers
-docker-compose ps
+docker compose ps
 
 # Verificar logs
-docker-compose logs --tail=50 sonarqube
-docker-compose logs --tail=50 sonar-exporter
+docker compose logs --tail=50 sonarqube
+docker compose logs --tail=50 sonar-exporter
 
 # Verificar conectividade
-docker-compose exec sonar-exporter curl http://sonarqube:9000/api/system/status
+docker compose exec sonar-exporter curl http://sonarqube:9000/api/system/status
 
 # Verificar variáveis
-docker-compose exec sonar-exporter env | grep SONAR
+docker compose exec sonar-exporter env | grep SONAR
 
 # Reiniciar serviços
-docker-compose restart
+docker compose restart
 ```
 
 ## ⚙️ Configurações Avançadas
@@ -326,7 +326,7 @@ cleanup_old_files 30  # 30 dias ao invés de 7
 
 ### Adicionar Novos Projetos
 
-**Editar `docker-compose.yml`**:
+**Editar `docker compose.yml`**:
 ```yaml
 # Adicionar mais containers exportadores
 sonar-exporter-projeto2:
@@ -337,7 +337,7 @@ sonar-exporter-projeto2:
 
 ### Configurar Recursos
 
-**Editar `docker-compose.yml`**:
+**Editar `docker compose.yml`**:
 ```yaml
 sonarqube:
   # Limitar recursos
