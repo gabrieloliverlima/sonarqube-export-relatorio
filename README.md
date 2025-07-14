@@ -134,12 +134,9 @@ sonar-scanner \
   -Dsonar.token=seu_token_aqui
 
 # Opção 2: SonarScanner via Docker
-docker run --rm \
-  --network teste_sonarnet \
-  -v "${PWD}:/usr/src" \
-  -e SONAR_HOST_URL=http://sonarqube:9000 \
-  -e SONAR_TOKEN=seu_token_aqui \
-  sonarsource/sonar-scanner-cli
+docker run --rm   -e SONAR_HOST_URL="http://192.168.100.10:9000" \
+-e SONAR_TOKEN=xxxxxxxxxxxxxxxxx   -v "$(pwd):/usr/src"   \
+sonarsource/sonar-scanner-cli
 ```
 
 ## 📊 Como Usar
